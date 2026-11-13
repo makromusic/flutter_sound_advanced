@@ -308,8 +308,11 @@ AudioRecInterface* audioRec;
                 } catch ( NSException* e)
                 {
                 }
-                delete audioRec;
+                // Chunk callbacks are dispatched to the main queue and use audioRec. Delete it
+                // after the ones already queued have run, instead of under their feet.
+                AudioRecInterface* finishedRec = audioRec;
                 audioRec = nil;
+                dispatch_async(dispatch_get_main_queue(), ^{ delete finishedRec; });
           }
           [self logDebug:  @"iOS: <--- stop (flautoRecorder)"];
 
