@@ -233,6 +233,9 @@ int AudioRecorderEngine::startRecorder()
 
 void AudioRecorderEngine::stopRecorder()
 {
+        // Remove the tap first: stopping the engine with the tap installed can still
+        // deliver a chunk callback while the recorder is being torn down.
+        [[engine inputNode] removeTapOnBus: 0];
         [engine stop];
         [fileHandle closeFile];
         if (previousTS != 0)
